@@ -59,6 +59,7 @@ def call_hscoin(caller, function_name, args, private_key=None):
         if key.lower().startswith("0x"): key = key[2:]
         payload['privateKey'] = key
 
+
     session = requests.Session()
     retries = Retry(total=1, backoff_factor=0.5, status_forcelist=[502,503,504], allowed_methods=["POST"], raise_on_status=False)
     session.mount('https://', HTTPAdapter(max_retries=retries))
@@ -72,6 +73,7 @@ def call_hscoin(caller, function_name, args, private_key=None):
         res = session.post(HSCOIN_ENDPOINT, json=payload, headers=HEADERS, timeout=30)
         if res.status_code == 200:
             res_json = res.json()
+            print("Response data (mint,burn,transfer):", res_json)
             tx_hash = res_json.get('transactionHash') or res_json.get('hash') or res_json.get('result', {}).get('transactionHash')
             return True, (tx_hash if tx_hash else res_json)
         else:
@@ -121,11 +123,10 @@ logger = logging.getLogger(__name__)
 getcontext().prec = 50 
 
 def hscoin_get_balance(user_address): 
-    # caller = getattr(settings, 'ADMIN_WALLET_ADDRESS', user_address)
-    caller="0x693d7eeac22122406e49df7a84a23382fa272748"
+    caller = user_address
     print(f" Caller: {caller}")
     try:
-        hex_input = encode_input_data("getBalance", [user_address])
+        hex_input = encode_input_data("balanceOf", [user_address])
         print("Hex-input for balanceOf:", hex_input)
         payload = {
             "caller": caller, 
@@ -138,7 +139,7 @@ def hscoin_get_balance(user_address):
         
         if res.status_code != 200: return 0
         data = res.json()
-        print("Response data:", data)
+        print("Response data of getting Balance:", data)
         if data.get("success") is False or "error" in data: return 0
 
         # ... (Phần tìm val giữ nguyên như câu trả lời trước) ...

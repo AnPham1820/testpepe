@@ -208,7 +208,43 @@ def register_view(request):
         
         # Tạo profile mới, bọc thêm để bắt lỗi unique từ DB
         try:
-            user_id = sql.insert_user(username, email, hashed_password, first_name, last_name, user_type)
+            ref_username = request.POST.get('ref_code')
+            if ref_username:
+                # 1. Tìm thông tin người giới thiệu
+                referrer = sql.one_user(username=ref_username)
+                
+                # Chỉ thực hiện nếu người giới thiệu tồn tại và không phải chính mình (tự giới thiệu)
+                if referrer and referrer['id'] != user_id:
+                    referrer_id = referrer['id']
+                    
+                    try:
+                        with connection.cursor() as cursor:
+                            # 2. Lưu vào bảng lịch sử referrals
+                            # rewarded_referrer=1, rewarded_referred=1 nghĩa là đã trả thưởng
+                            cursor.execute("""
+                                INSERT INTO referrals (referrer_id, referred_id, rewarded_referrer, rewarded_referred)
+                                VALUES (%s, %s, 1, 1)
+                            """, [referrer_id, user_id])
+                            
+                            # 3. Cộng 50 Coin cho Người giới thiệu
+                            cursor.execute("""
+                                UPDATE users 
+                                SET coins = COALESCE(coins, 0) + 50 
+                                WHERE id = %s
+                            """, [referrer_id])
+                            
+                            # 4. Cộng 50 Coin cho Người mới đăng ký (Bạn)
+                            cursor.execute("""
+                                UPDATE users 
+                                SET coins = COALESCE(coins, 0) + 50 
+                                WHERE id = %s
+                            """, [user_id])
+                            
+                            print(f"Referral success: {referrer['username']} invited {username}")
+                            
+                    except Exception as e:
+                        # Nếu lỗi phần referral thì chỉ log lại, không chặn việc đăng ký
+                        print(f"Lỗi xử lý referral: {e}")
         except e:
             messages.error(request, 'Tên đăng nhập hoặc email đã tồn tại')
             return render(request, 'accounts/register.html')

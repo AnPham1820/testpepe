@@ -73,6 +73,8 @@
                 <form action="" method="POST">
                     {% csrf_token %}
 
+                    <input type="hidden" name="ref_code" value="{{ request.GET.ref }}">
+
                     <div class="mb-3">
                         <label for="username" class="form-label fw-semibold">Tên đăng nhập *</label>
                         <input type="text" class="form-control" id="username" name="username" required minlength="3"
@@ -122,6 +124,12 @@
                             <option value="teacher">Giảng viên</option>
                         </select>
                         <small class="form-text text-danger" id="roleError"></small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="ref_code" class="form-label fw-semibold">Mã giới thiệu (Tùy chọn)</label>
+                        <input type="text" class="form-control" id="ref_code" name="ref_code" 
+                               value="{{ request.GET.ref }}" placeholder="Nhập username người giới thiệu">
                     </div>
 
                     <button type="submit" class="btn btn-success bg-gradient w-100 py-3 fw-semibold mt-3 rounded-3"

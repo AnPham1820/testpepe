@@ -1,0 +1,20 @@
+[
+  {
+    "type": "transfer",
+    "amount": 1.0,
+    "currency": "STK",
+    "counterparty": "0x98a63b8e7aa5328827abcdd5f5c3f4d1ec2ed6a3",
+    "tx_hash": null,
+    "note": "Chuyển token tới địa chỉ khác",
+    "ts": "2025-12-02T11:06:50.517770Z"
+  },
+  {
+    "type": "transfer",
+    "amount": 1.0,
+    "currency": "STK",
+    "counterparty": "0xc839fb60d86b9838f5772c33dc1f77c67fd809e7",
+    "tx_hash": null,
+    "note": "Chuyển token tới địa chỉ khác",
+    "ts": "2025-12-02T10:59:40.231861Z"
+  }
+]
