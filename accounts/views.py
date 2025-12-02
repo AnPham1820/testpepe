@@ -189,6 +189,7 @@ def register_view(request):
     last_name          = request.POST.get('last_name') or None
     user_type          = request.POST.get('user_type')
     
+    
     # Validation
     if password != password_confirm:
         messages.error(request, 'Mật khẩu không khớp')
@@ -208,6 +209,7 @@ def register_view(request):
         
         # Tạo profile mới, bọc thêm để bắt lỗi unique từ DB
         try:
+            user_id = sql.insert_user(username, email, hashed_password, first_name, last_name, user_type)
             ref_username = request.POST.get('ref_code')
             if ref_username:
                 # 1. Tìm thông tin người giới thiệu
